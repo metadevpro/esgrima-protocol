@@ -1,0 +1,25 @@
+{
+    "name": "daga-server",
+    "version": "0.1.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "start": "ts-node server2",
+        "server2": "ts-node server2",
+        "server1": "node server1.js",
+        "node-client": "node node-client.js",
+        "web-client": "open client.html"
+    },
+    "author": "Metadev",
+    "license": "UNLICENSED",
+    "dependencies": {
+        "ts-node": "^10.9.2",
+        "websocket": "^1.0.34"
+    },
+    "prettier": {
+        "trailingComma": "none",
+        "tabWidth": 2,
+        "semi": true,
+        "singleQuote": true
+    }
+}
