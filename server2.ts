@@ -176,10 +176,7 @@ const addToRoom = (msg: AddMessage): void => {
     };
     rooms[msg.locator] = room;
   }
-  room.messages.push({
-    ts: msg.ts,
-    data: msg.payload
-  });
+  room.messages.push(msg);
 };
 
 const sendTo = (clientId: string, msg: Message): void => {
@@ -224,13 +221,7 @@ const enroll = (key: string, locator: string): void => {
   const userId = clients[key].user.id;
 
   ch.messages.forEach((m) => {
-    sendTo(clientId, {
-      type: 'ADD',
-      clientId,
-      userId,
-      ts: m.ts,
-      payload: m.data
-    } as AddMessage);
+    sendTo(clientId, m);
   });
 };
 
