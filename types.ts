@@ -1,9 +1,9 @@
 export interface RoomInfo {
   locator: string;
   ownerId: string;
-  messages: MesageInfo[];
+  messages: MessageInfo[];
 }
-export interface MesageInfo {
+export interface MessageInfo {
   ts: string;
   data: unknown;
 }
