@@ -1,11 +1,7 @@
 export interface RoomInfo {
   locator: string;
   ownerId: string;
-  messages: MesageInfo[];
-}
-export interface MesageInfo {
-  ts: string;
-  data: unknown;
+  messages: AddMessage[];
 }
 
 export interface UserInfo {
