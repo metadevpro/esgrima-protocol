@@ -138,7 +138,7 @@ const processBye = (key: string, msg: ByeMessage): void => {
 };
 const processCreateRoom = (key: string, msg: CreateMessage): void => {
   const locator = createLocator(msg);
-  createRoom(key, locator);
+  createRoom(key, locator, msg.initialModel);
   sendCack(key, locator);
 };
 const processEnrollToRoom = (key: string, msg: EnrollMessage): void => {
@@ -205,10 +205,15 @@ const deleteRoom = (key: string, locator: string): void => {
   }
 };
 
-const createRoom = (key: string, locator: string): void => {
+const createRoom = (
+  key: string,
+  locator: string,
+  initialModel: unknown
+): void => {
   const client = clients[key];
   const room = {
     locator,
+    initialModel,
     messages: [],
     ownerId: client?.user.id
   } as RoomInfo;
@@ -219,6 +224,13 @@ const enroll = (key: string, locator: string): void => {
   const ch = rooms[locator];
   const clientId = clients[key].key;
   const userId = clients[key].user.id;
+
+  sendTo(clientId, {
+    type: 'EACK',
+    locator,
+    initialModel: ch.initialModel,
+    ts: new Date().toISOString()
+  });
 
   ch.messages.forEach((m) => {
     sendTo(clientId, m);
