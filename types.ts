@@ -14,7 +14,7 @@ export interface DagaModelStub {}
 export interface RoomInfo {
   locator: string;
   ownerId: string;
-  initialModel?: DagaModelStub;
+  initialModel: DagaModelStub;
   messages: AddMessage[];
 }
 
@@ -66,7 +66,7 @@ export interface CreateMessage extends IMessage {
   userId: string;
   /** Correlation id for the client */
   refId: string;
-  initialModel?: DagaModelStub;
+  initialModel: DagaModelStub;
 }
 export interface CreateAckMessage extends IMessage {
   type: 'CACK';
@@ -85,7 +85,7 @@ export interface EnrollMessage extends IMessage {
 export interface EnrollAckMessage extends IMessage {
   type: 'EACK';
   locator: string;
-  initialModel?: DagaModelStub;
+  initialModel: DagaModelStub;
 }
 export interface DeleteMessage extends IMessage {
   type: 'DLTE';

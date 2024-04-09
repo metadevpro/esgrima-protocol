@@ -168,12 +168,8 @@ const removeClient = (key: string): void => {
 const addToRoom = (msg: AddMessage): void => {
   let room = rooms[msg.locator];
   if (!room) {
-    room = {
-      locator: msg.locator,
-      ownerId: msg.clientId,
-      messages: []
-    };
-    rooms[msg.locator] = room;
+    console.error('AddMessage for unknown locator:', msg.locator);
+    return;
   }
   room.messages.push(msg);
 };
