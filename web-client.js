@@ -30,7 +30,8 @@ function enrollRoom() {
 
 function connect() {
   clientName = document.getElementById('name').value;
-  client = new WebSocket('ws://localhost:8080/', 'esgrima');
+  // client = new WebSocket('ws://localhost:8080/', 'esgrima');
+  client = new WebSocket('wss://localhost:3001/ws/', 'esgrima');
 
   client.onerror = function () {
     logToPage('Connection Error');
