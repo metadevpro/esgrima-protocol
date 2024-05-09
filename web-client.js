@@ -1,6 +1,8 @@
 var clientName = 'Alice';
 var client;
 
+var deviceId = 'deviceId' + Math.floor(Math.random() * 1000);
+
 function logToPage(message) {
   var board = document.getElementById('board');
   board.innerHTML += message + '<br/>';
@@ -30,7 +32,11 @@ function enrollRoom() {
 
 function connect() {
   clientName = document.getElementById('name').value;
-  client = new WebSocket('ws://localhost:8080/', 'esgrima');
+  var server = document.getElementById('server').value;
+  var protocol = document.getElementById('protocol').value;
+
+  // client = new WebSocket('ws://localhost:8080/', 'esgrima');
+  client = new WebSocket(server, protocol);
 
   client.onerror = function () {
     logToPage('Connection Error');
@@ -42,7 +48,7 @@ function connect() {
     var payload = JSON.stringify({
       type: 'HELO',
       ts: new Date().toISOString(),
-      clientId: clientName,
+      clientId: deviceId,
       userId: clientName,
       version: '0.0.1'
     });
@@ -78,7 +84,7 @@ function sendAddMessage() {
   var msg = {
     type: 'ADD',
     ts: new Date().toISOString(),
-    clientId: clientName,
+    clientId: deviceId,
     userId: clientName,
     locator,
     payload: message
@@ -89,7 +95,7 @@ function sendCreateMessage(refId) {
   var msg = {
     type: 'CREA',
     ts: new Date().toISOString(),
-    clientId: clientName,
+    clientId: deviceId,
     userId: clientName,
     refId,
     initialModel: {}
@@ -100,7 +106,7 @@ function sendEnrollMessage(locator) {
   var msg = {
     type: 'ENRO',
     ts: new Date().toISOString(),
-    clientId: clientName,
+    clientId: deviceId,
     userId: clientName,
     locator
   };
