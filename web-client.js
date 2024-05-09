@@ -49,7 +49,8 @@ function connect() {
       type: 'HELO',
       ts: new Date().toISOString(),
       clientId: deviceId,
-      userId: clientName
+      userId: clientName,
+      version: '0.0.1'
     });
     client.send(payload);
   };
@@ -96,7 +97,8 @@ function sendCreateMessage(refId) {
     ts: new Date().toISOString(),
     clientId: deviceId,
     userId: clientName,
-    refId
+    refId,
+    initialModel: {}
   };
   sendMessage(msg);
 }
