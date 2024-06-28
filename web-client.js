@@ -16,10 +16,9 @@ function disconnect() {
 }
 
 function createRoom() {
-  var refId = document.getElementById('refId').value;
   if (client) {
-    sendCreateMessage(refId);
-    logToPage('Request create room ' + refId);
+    sendCreateMessage();
+    logToPage('Request create room.');
   }
 }
 function enrollRoom() {
@@ -91,13 +90,12 @@ function sendAddMessage() {
   };
   sendMessage(msg);
 }
-function sendCreateMessage(refId) {
+function sendCreateMessage() {
   var msg = {
     type: 'CREA',
     ts: new Date().toISOString(),
     clientId: deviceId,
     userId: clientName,
-    refId,
     initialModel: {}
   };
   sendMessage(msg);
