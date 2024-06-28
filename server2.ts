@@ -1,15 +1,19 @@
 import {
-  Message,
   ClientInfo,
+  EsgrimaAddMessage,
+  EsgrimaByeMessage,
+  EsgrimaCreateAckMessage,
+  EsgrimaCreateMessage,
+  EsgrimaDeleteMessage,
+  EsgrimaEnrollAckMessage,
+  EsgrimaEnrollMessage,
+  EsgrimaErrorMessage,
+  EsgrimaHelloMessage,
+  EsgrimaMessage,
+  EsgrimaMessageType,
+  EsgrimaOkMessage,
   RoomInfo,
-  HeloMessage,
-  ErrorMessage,
-  AddMessage,
-  DeleteMessage,
-  CreateMessage,
-  ByeMessage,
-  OkMessage,
-  EnrollMessage
+  hashMessage
 } from './types';
 var WebSocketServer = require('websocket').server;
 var http = require('http');
@@ -64,7 +68,7 @@ wsServer.on('request', (request: any) => {
   };
 
   connection.on('message', (message: any) => {
-    const content = JSON.parse(message.utf8Data) as Message;
+    const content = JSON.parse(message.utf8Data) as EsgrimaMessage;
     processMessage(key, content);
   });
 
@@ -103,57 +107,57 @@ wsServer.on('request', (request: any) => {
   });
 });
 
-const processMessage = (key: string, msg: Message): void => {
+const processMessage = (key: string, msg: EsgrimaMessage): void => {
   switch (msg.type.toUpperCase()) {
     case 'HELO':
-      return processHelo(key, msg as HeloMessage);
+      return processHelo(key, msg as EsgrimaHelloMessage);
     case 'BYE':
-      return processBye(key, msg as ByeMessage);
+      return processBye(key, msg as EsgrimaByeMessage);
     case 'CREA':
-      return processCreateRoom(key, msg as CreateMessage);
+      return processCreateRoom(key, msg as EsgrimaCreateMessage);
     case 'ENRO':
-      return processEnrollToRoom(key, msg as EnrollMessage);
+      return processEnrollToRoom(key, msg as EsgrimaEnrollMessage);
     case 'DLTE':
-      return processDeleteRoom(key, msg as DeleteMessage);
+      return processDeleteRoom(key, msg as EsgrimaDeleteMessage);
     case 'ADD':
-      return processAddData(key, msg as AddMessage);
+      return processAddData(key, msg as EsgrimaAddMessage);
     case 'ERR':
-      return processError(msg as ErrorMessage);
+      return processError(msg as EsgrimaErrorMessage);
     default:
       return processOtherError(msg);
   }
 };
 
-const processHelo = (key: string, msg: HeloMessage): void => {
+const processHelo = (key: string, msg: EsgrimaHelloMessage): void => {
   const userName = msg.clientId;
   clients[key].user.username = userName;
 
   addClient(key, msg.clientId, userName);
   sendOk(key);
 };
-const processBye = (key: string, msg: ByeMessage): void => {
+const processBye = (key: string, msg: EsgrimaByeMessage): void => {
   removeClient(key);
   sendOk(key);
 };
-const processCreateRoom = (key: string, msg: CreateMessage): void => {
+const processCreateRoom = (key: string, msg: EsgrimaCreateMessage): void => {
   const locator = createLocator(msg);
   createRoom(key, locator, msg.initialModel);
-  sendCack(key, locator, msg.refId);
+  sendCack(key, locator, hashMessage(msg));
 };
-const processEnrollToRoom = (key: string, msg: EnrollMessage): void => {
-  enroll(key, msg.locator);
+const processEnrollToRoom = (key: string, msg: EsgrimaEnrollMessage): void => {
+  enroll(key, msg.locator, hashMessage(msg));
 };
-const processDeleteRoom = (key: string, msg: DeleteMessage): void => {
+const processDeleteRoom = (key: string, msg: EsgrimaDeleteMessage): void => {
   deleteRoom(key, msg.locator);
 };
-const processAddData = (key: string, msg: AddMessage): void => {
+const processAddData = (key: string, msg: EsgrimaAddMessage): void => {
   addToRoom(msg);
   broadcastToOthers(key, msg);
 };
-const processError = (msg: ErrorMessage): void => {
+const processError = (msg: EsgrimaErrorMessage): void => {
   console.error(msg);
 };
-const processOtherError = (msg: Message): void => {
+const processOtherError = (msg: EsgrimaMessage): void => {
   console.error(msg);
 };
 
@@ -165,7 +169,7 @@ const removeClient = (key: string): void => {
   delete clients[key];
 };
 
-const addToRoom = (msg: AddMessage): void => {
+const addToRoom = (msg: EsgrimaAddMessage): void => {
   let room = rooms[msg.locator];
   if (!room) {
     console.error('AddMessage for unknown locator:', msg.locator);
@@ -174,7 +178,7 @@ const addToRoom = (msg: AddMessage): void => {
   room.messages.push(msg);
 };
 
-const sendTo = (clientId: string, msg: Message): void => {
+const sendTo = (clientId: string, msg: EsgrimaMessage): void => {
   const payload = JSON.stringify(msg);
   console.log('Sending to ', clientId, ' Payload: ', payload);
   const client = clients[clientId];
@@ -188,7 +192,7 @@ const sendOk = (clientId: string): void => {
     clientId,
     userId,
     ts: new Date().toISOString()
-  } as OkMessage;
+  } as EsgrimaOkMessage;
   sendTo(clientId, okMsg);
 };
 
@@ -215,38 +219,39 @@ const createRoom = (
   rooms[locator] = room;
 };
 
-const enroll = (key: string, locator: string): void => {
+const enroll = (key: string, locator: string, responseTo: string): void => {
   const ch = rooms[locator];
   const clientId = clients[key].key;
   const userId = clients[key].user.id;
 
   sendTo(clientId, {
-    type: 'EACK',
-    locator,
-    initialModel: ch.initialModel,
+    type: EsgrimaMessageType.ENROLL_ACK,
+    clientId,
+    userId,
+    responseTo,
     ts: new Date().toISOString()
-  });
+  } as EsgrimaEnrollAckMessage);
 
   ch.messages.forEach((m) => {
     sendTo(clientId, m);
   });
 };
 
-const sendCack = (key: string, locator: string, refId: string): void => {
+const sendCack = (key: string, locator: string, responseTo: string): void => {
   const ch = rooms[locator];
   const clientId = clients[key].key;
   const userId = clients[key].user.id;
   sendTo(clientId, {
-    type: 'CACK',
+    type: EsgrimaMessageType.CREATE_ACK,
     clientId,
     userId,
-    refId,
+    responseTo,
     ts: new Date().toISOString(),
     locator
-  });
+  } as EsgrimaCreateAckMessage);
 };
 
-const broadcastToOthers = (key: string, msg: Message): void => {
+const broadcastToOthers = (key: string, msg: EsgrimaMessage): void => {
   const payload = JSON.stringify(msg);
   console.log(
     `Broadcasting to others: ${
@@ -261,7 +266,7 @@ const broadcastToOthers = (key: string, msg: Message): void => {
   });
 };
 
-const broadcast = (msg: Message): void => {
+const broadcast = (msg: EsgrimaMessage): void => {
   const payload = JSON.stringify(msg);
   console.log(
     `Broadcasting to all: ${Object.keys(clients).length} clients. ${payload}`
@@ -272,7 +277,7 @@ const broadcast = (msg: Message): void => {
   });
 };
 
-const createLocator = (msg: CreateMessage, size: number = 8): string => {
+const createLocator = (msg: EsgrimaCreateMessage, size: number = 8): string => {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTVWXYZ0123456789';
   let res = '';
   if (size <= 0) {
