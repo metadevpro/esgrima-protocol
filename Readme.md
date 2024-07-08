@@ -203,7 +203,7 @@ export interface EsgrimaEnrollMessage extends EsgrimaMessage {
 
 Confirms the successful enrollment of a user into a room in response to a `ENRO` message. This message includes the `locator` of the room that has been created.
 
-This message can optionally include the `initialModel` and a list of `changes` so that the enrolled user can reconstruct the current state of the model, as well as a list of `userIds` so that the enrolled user can know which other users are present in the room.
+This message can optionally include the `initialModel` and a list of `changes` so that the enrolled user can reconstruct the current state of the model, as well as a list of `userIds` so that the enrolled user can know which other users are present in the room and an `ownerId` so that the enrolled user can know which user is the owner of the room.
 
 Similar to `CACK` messages, `EACK` messages include a `responseTo` field which works in the same way.
 
@@ -212,6 +212,7 @@ export interface EsgrimaEnrollAckMessage extends EsgrimaMessage {
   type: EsgrimaMessageType.ENROLL_ACK;
   responseTo: string;
   locator: string;
+  ownerId?: string;
   initialModel?: DagaModel;
   changes: ModelChange[];
   userIds: string[];
@@ -228,6 +229,7 @@ export interface EsgrimaEnrollAckMessage extends EsgrimaMessage {
   userId: 'u42',
   responseTo: '08ada046e213ed9eeab06d0083a1b898f3dbafd390f87d4d1614b5ac88796e4a',
   locator: 'ABC3456ZB',
+  ownerId: 'u43',
   initialModel: {
     // ...
   },
