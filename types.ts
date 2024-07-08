@@ -114,6 +114,7 @@ export interface EsgrimaEnrollMessage extends EsgrimaMessage {
 export interface EsgrimaEnrollAckMessage extends EsgrimaResponseMessage {
   type: EsgrimaMessageType.ENROLL_ACK;
   locator: string;
+  ownerId?: string;
   initialModel?: DagaModel;
   changes: ModelChange[];
   userIds: string[];
