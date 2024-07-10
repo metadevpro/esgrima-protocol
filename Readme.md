@@ -348,6 +348,114 @@ export interface EsgrimaErrorMessage extends EsgrimaMessage {
 }
 ```
 
+### Message Sequences
+
+#### Connecting a client
+
+For connecting a client, a `HELO` message is sent from the client to the server, to which the server responds with an `OK`.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  Client ->> Server: HELO
+  Server ->> Client: OK
+```
+
+#### Disconnecting a client
+
+For disconnecting a client, a `BYE` message is sent from the client to the server, which is then broadcast to the clients that share a room with the disconnected client. `BYE` messages are responded with an `OK` message.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  participant Other clients
+  Client ->> Server: BYE
+  Server ->> Client: OK
+  Server ->> Other clients: BYE
+  Other clients ->> Server: OK
+```
+
+#### Creating a room
+
+For connecting a client, a `CREA` message is sent from the client to the server, to which the server responds with an `CACK`.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  Client ->> Server: CREA
+  Server ->> Client: CACK
+```
+
+#### Enrolling a user to a room
+
+For connecting a client, a `ENRO` message is sent from the client to the server, to which the server responds with an `EACK`. The `ENRO` message is then broadcast to other clients, to which they respond with an `OK`.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  participant Other clients
+  Client ->> Server: ENRO
+  Server ->> Client: EACK
+  Server ->> Other clients: ENRO
+  Other clients ->> Server: OK
+```
+
+#### Deleting a room
+
+For deleting a room, a `DLTE` message is sent from the client to the server, which is then broadcast to the other clients in that room. `DLTE` messages are responded with an `OK` message.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  participant Other clients
+  Client ->> Server: DLTE
+  Server ->> Client: OK
+  Server ->> Other clients: DLTE
+  Other clients ->> Server: OK
+```
+
+#### Adding changes
+
+For adding changes to the diagram in a room, an `ADD` message is sent from the client to the server, which is then broadcast to the other clients in that room. `ADD` messages are responded with an `OK` message.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  participant Other clients
+  Client ->> Server: ADD
+  Server ->> Client: OK
+  Server ->> Other clients: ADD
+  Other clients ->> Server: OK
+```
+
+#### Server error
+
+For informing the client of a server error, an `ERR` message is sent. A response is not needed.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  Server ->> Client: ERR
+```
+
+#### Client error
+
+For informing the server of a client error, an `ERR` message is sent. A response is not needed.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Server
+  Client ->> Server: ERR
+```
+
 ## Usage
 
 1. Install dependencies with `npm i`.
