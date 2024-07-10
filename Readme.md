@@ -442,7 +442,7 @@ For informing the client of a server error, an `ERR` message is sent. A response
 sequenceDiagram
   participant Client
   participant Server
-  Client ->> Server: ERR
+  Server ->> Client: ERR
 ```
 
 #### Client error
@@ -453,7 +453,7 @@ For informing the server of a client error, an `ERR` message is sent. A response
 sequenceDiagram
   participant Client
   participant Server
-  Server ->> Client: ERR
+  Client ->> Server: ERR
 ```
 
 ## Usage
